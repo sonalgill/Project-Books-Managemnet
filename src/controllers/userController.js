@@ -1,15 +1,36 @@
 const userModel = require("../models/userModel");
 
 let isValidTitle = function (title) {
-  return ["Mr", "Mrs", "miss"].indexOf(title) !== -1;
+  return ["Mr", "Mrs", "Miss"].indexOf(title) !== -1;
 };
 
+
+function validateMobile($phone) {
+    var phoneReg = /^([0|\+[0-9]{1,5})?([7-9][0-9]{9})$/;
+    if (!phoneReg.test($phone)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function validateEmail($email) {
+    var emailReg = /^(\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3}))$/;
+    if (!emailReg.test($email)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+
+//==============================create user====================================//
 const createUser = async (req, res) => {
   try {
     let data = req.body;
     if (Object.keys(data).length > 0) {
       let { title, name, phone, email, password, address } = data;
-      if (isValidTitle(title)) {
+      if (!isValidTitle(title)) {
         res
           .status(400)
           .send({ staus: false, msg: "Title should be Mr, Mrs, Miss" });
@@ -49,19 +70,35 @@ const createUser = async (req, res) => {
           .send({ staus: false, msg: "please provide valid address" });
         return;
       }
+
       let alreadyUsedEmail = await userModel.findOne({ email });
       if (alreadyUsedEmail) {
         res
-          .staus(400)
-          .send({ staus: false, msg: "This email is already registerd" });
+          .status(400)
+          .send({ status: false, msg: "This email is already registerd" });
         return;
       }
 
-      if (phone.match([/^[6-9]\d{9}$/])) {
+      if (!validateMobile(phone)) {
         return res.status(400).send({
           status: false,
           msg: "please provide valid phone number",
         });
+      }
+
+      if (!validateEmail(email)) {
+        return res.status(400).send({
+          status: false,
+          msg: "please provide valid email",
+        });
+      }
+
+      let alreadyUsedPhone = await userModel.findOne({ phone });
+      if (alreadyUsedPhone) {
+        res
+          .status(400)
+          .send({ status: false, msg: "This phone is already registerd" });
+        return;
       }
 
       data.name=name.replace(/\s+/g,' ')
@@ -76,7 +113,7 @@ const createUser = async (req, res) => {
         .send({ status: false, msg: "Request body can not be empty" });
     }
   } catch (error) {
-    res.staus(500).send({ status: false, error: error.message });
+    res.status(500).send({ status: false, error: error.message });
   }
 };
 
