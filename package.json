@@ -4,7 +4,7 @@
   "description": "Book Management",
   "main": "index.js",
   "scripts": {
-    "test": "node src/index"
+    "test": "node src/index.js"
   },
   "repository": {
     "type": "git",
