@@ -11,7 +11,7 @@ mongoose
       useNewUrlParser: true,
     }
   )
-  .then(() => console.log("MongoDB is connected on 27017"))
+  .then(() => console.log("MongoDB is connected"))
   .catch((err) => console.log(err));
 
 app.use("/", route);

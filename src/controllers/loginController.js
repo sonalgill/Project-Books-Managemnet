@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel");
 
-exports.login = async function (req, res) {
+const loginUser = async function (req, res) {
   try {
     let checkEmaillAndPassword = await userModel.findOne({
       email: req.body.email,
@@ -46,3 +46,5 @@ exports.login = async function (req, res) {
     });
   }
 };
+
+module.exports.loginUser=loginUser
