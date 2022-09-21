@@ -24,7 +24,10 @@ router.post(
 );
 
 //Get Books
-router.get("/books",  bookController.getBooks);
+router.get("/books", middleware.authentication, bookController.getBooks);
+
+//Get Book by BookID
+router.get("/books/:bookId", middleware.authentication, bookController.getBookById)
 
 //=========================== if endpoint is not correct==========================================
 

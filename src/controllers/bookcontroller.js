@@ -1,6 +1,7 @@
 const bookModel = require("../models/bookModel");
 const userModel = require("../models/userModel");
 const mongoose = require("mongoose");
+const reviewModel = require('../models/reviewModel')
 
 const isvalidObjectId = function (ObjectId) {
   return mongoose.Types.ObjectId.isValid(ObjectId);
@@ -133,7 +134,7 @@ const getBooks = async function (req, res) {
   try {
     let { userId, category, subcategory } = req.query
     let filter = {}
-  
+
     if (Object.keys(req.query).length) {
       if (userId) { filter.userId = userId }
       if (category) { filter.category = category }
@@ -171,4 +172,51 @@ const getBooks = async function (req, res) {
   }
 };
 
-module.exports = { createBook, getBooks };
+
+
+
+//============get book by bookID================//
+let getBookById = async (req, res) => {
+  try {
+    let bookId = req.params.bookId;
+    //------if bookID is not valid------//
+    if (!isvalidObjectId(bookId)) {
+      return res
+        .status(400)
+        .send({ status: false, message: "BookId is not Valid" });
+    }
+    let bookData = await bookModel.findOne({ _id: bookId, isDeleted: false });
+    //----------if no Data found -------//
+    if (!isValid(bookData)) {
+      return res.status(404).send({
+        status: false,
+        message: `Book is not found with this ID: ${bookId}`,
+      });
+    }
+//--------getting the data from review Model-----//
+    let reviews = await reviewModel
+      .find({ bookId: bookId, isDeleted: false })
+      .select({
+        _id: 1,
+        bookId: 1,
+        reviewedBy: 1,
+        reviewedAt: 1,
+        rating: 1,
+        review: 1,
+      });
+
+    let bookReviews = {
+      bookData,
+      reviewsData: reviews,
+    };
+
+    return res
+      .status(200)
+      .send({ status: true, message: "Books list", data: bookReviews });
+  } catch (error) {
+    return res.status(500).send({ status: false, Error: error.message });
+  }
+};
+
+
+module.exports = { createBook, getBooks, getBookById };
