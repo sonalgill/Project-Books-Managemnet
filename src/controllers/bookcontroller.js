@@ -29,8 +29,8 @@ const createBook = async (req, res) => {
       });
       return;
     }
-
-    const { title, excerpt, userId, ISBN, category, subcategory, releasedAt } =
+  
+    const { title, excerpt, userId, ISBN, category, subcategory, releasedAt, deletedAt } =
       data;
 
 
@@ -41,12 +41,22 @@ const createBook = async (req, res) => {
         .send({ status: false, message: "Book Title is required" });
       return;
     }
+
+    let alreadyUsedTitle = await bookModel.findOne({ title });
+    if (alreadyUsedTitle) {
+      res
+        .status(400)
+        .send({ status: false, msg: "This should be unique" });
+      return;
+    }
     if (!isValid(excerpt)) {
       res
         .status(400)
         .send({ status: false, message: "Book excerpt is required" });
       return;
     }
+
+
     if (!isValid(userId)) {
       res.status(400).send({ status: false, message: "User id is required" });
       return;
@@ -54,7 +64,7 @@ const createBook = async (req, res) => {
     if (!isvalidObjectId(userId)) {
       res.status(400).send({
         status: false,
-        message: `${userId}is not a valid user id`,
+        message: `${userId} is not a valid user id`,
       });
       return;
     }
@@ -62,6 +72,14 @@ const createBook = async (req, res) => {
       res.status(400).send({ status: false, message: "Book ISBN is required" });
       return;
     }
+    let alreadyUsedISBN = await bookModel.findOne({ ISBN });
+    if (alreadyUsedISBN) {
+      res
+        .status(400)
+        .send({ status: false, msg: "ISBN id should be unique" });
+      return;
+    }
+
     if (!isValid(category)) {
       res
         .status(400)
@@ -78,7 +96,7 @@ const createBook = async (req, res) => {
 
     const user = await userModel.findById(userId);
     if (!user) {
-      res.status(400).send({ status: false, message: " User does not exit " });
+      res.status(400).send({ status: false, message: "User does not exit" });
     }
     // Validations end
     const bookData = {
@@ -89,6 +107,7 @@ const createBook = async (req, res) => {
       category,
       subcategory,
       releasedAt: releasedAt ? new Date() : null,
+      deletedAt: deletedAt ? new Date() :null
     };
     const newBookCreated = await bookModel.create(bookData);
     res.status(201).send({

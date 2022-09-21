@@ -37,25 +37,25 @@ const createUser = async (req, res) => {
       }
 
       if (!name) {
-        res.status(400).send({ staus: false, msg: "name is required" });
+        res.status(400).send({ staus: false, msg: "Name is required" });
         return;
       }
 
       if (!phone) {
         res
           .status(400)
-          .send({ staus: false, msg: " phone number is required" });
+          .send({ staus: false, msg: "Phone number is required" });
         return;
       }
       if (!email) {
-        res.status(400).send({ staus: false, msg: "email is required" });
+        res.status(400).send({ staus: false, msg: "Email is required" });
         return;
       }
 
       if (!password) {
         res.status(400).send({
           staus: false,
-          msg: "Length should be between 8 to 15 letters",
+          msg: "Password length should be between 8 to 15 letters",
         });
         return;
       }
@@ -63,21 +63,21 @@ const createUser = async (req, res) => {
       if (!address) {
         res
           .status(400)
-          .send({ staus: false, msg: "please provide valid address" });
+          .send({ staus: false, msg: "Please provide valid address" });
         return;
       }
 
       if (!validateMobile(phone)) {
         return res.status(400).send({
           status: false,
-          msg: "please provide valid phone number",
+          msg: "Please provide valid phone number",
         });
       }
 
       if (!validateEmail(email)) {
         return res.status(400).send({
           status: false,
-          msg: "please provide valid email",
+          msg: "Please provide valid email",
         });
       }
 
@@ -94,7 +94,7 @@ const createUser = async (req, res) => {
       if (alreadyUsedPhone) {
         res
           .status(400)
-          .send({ status: false, msg: "This phone is already registerd" });
+          .send({ status: false, msg: "This phone number is already registerd" });
         return;
       }
 
