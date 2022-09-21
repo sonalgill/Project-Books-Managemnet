@@ -22,6 +22,8 @@ const loginUser = async function (req, res) {
       email: checkEmaillAndPassword.email,
       password: checkEmaillAndPassword.password,
       batch: "plutonium",
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 10 * 60 * 60,
     };
 
     //Creating Token
@@ -29,15 +31,17 @@ const loginUser = async function (req, res) {
     let token = jwt.sign(
       {
         payloadDetails,
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 10 * 60 * 60,
       },
       "Group-27-Secret-Key"
     );
 
-    //verifying the token
-
-    res.status(201).send({ status: true, data: token });
+    res.status(201).send({
+      status: true,
+      data: token,
+      userId: payloadDetails.userId,
+      exp: payloadDetails.exp,
+      iat: payloadDetails.iat,
+    });
   } catch (err) {
     return res.status(500).send({
       msg: false,
@@ -47,4 +51,4 @@ const loginUser = async function (req, res) {
   }
 };
 
-module.exports.loginUser=loginUser
+module.exports.loginUser = loginUser;
