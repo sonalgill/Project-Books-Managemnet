@@ -18,7 +18,6 @@ const isValid = function (value) {
 
 //==============================create book====================================//
 
-
 const createBook = async (req, res) => {
   try {
     const data = req.body;
@@ -29,10 +28,9 @@ const createBook = async (req, res) => {
       });
       return;
     }
-  
-    const { title, excerpt, userId, ISBN, category, subcategory, releasedAt, deletedAt } =
-      data;
 
+    const { title, excerpt, userId, ISBN, category, subcategory, releasedAt } =
+      data;
 
     //validations
     if (!isValid(title)) {
@@ -56,7 +54,6 @@ const createBook = async (req, res) => {
       return;
     }
 
-
     if (!isValid(userId)) {
       res.status(400).send({ status: false, message: "User id is required" });
       return;
@@ -74,9 +71,7 @@ const createBook = async (req, res) => {
     }
     let alreadyUsedISBN = await bookModel.findOne({ ISBN });
     if (alreadyUsedISBN) {
-      res
-        .status(400)
-        .send({ status: false, msg: "ISBN id should be unique" });
+      res.status(400).send({ status: false, msg: "ISBN id should be unique" });
       return;
     }
 
@@ -93,18 +88,18 @@ const createBook = async (req, res) => {
         .send({ status: false, message: "Book subcategory is required" });
       return;
     }
-    if(!releasedAt){
+    if (!releasedAt) {
       res
         .status(400)
         .send({ status: false, message: "releasedAt is required" });
       return;
     }
-   if(!(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/).test(releasedAt)){
-    res
+    if (!(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/).test(releasedAt)) {
+      res
         .status(400)
         .send({ status: false, message: "releasedAt can be a DATE only" });
       return;
-   }
+    }
 
     const user = await userModel.findById(userId);
     if (!user) {
@@ -119,7 +114,7 @@ const createBook = async (req, res) => {
       category,
       subcategory,
       releasedAt,
-      deletedAt: deletedAt ? new Date() :null
+      deletedAt: deletedAt ? new Date() : null
     };
     const newBookCreated = await bookModel.create(bookData);
     res.status(201).send({
@@ -132,17 +127,13 @@ const createBook = async (req, res) => {
   }
 };
 
-
-
-
-
-
 //============get books =====================//
 
 const getBooks = async function (req, res) {
   try {
     let { userId, category, subcategory } = req.query
     let filter = {}
+  
     if (Object.keys(req.query).length) {
       if (userId) { filter.userId = userId }
       if (category) { filter.category = category }
@@ -151,10 +142,11 @@ const getBooks = async function (req, res) {
       if (!Object.keys(filter).length) {
         return res.status(404).send({
           status: false,
-          msg: "No Book Found!!"
-        })
+          msg: "No Book Found!!",
+        });
       }
     }
+
     filter.isDeleted = false
     let allBooks = await bookModel.find({ $and: [filter] }).select({
       title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1
@@ -163,27 +155,20 @@ const getBooks = async function (req, res) {
     if (!allBooks.length) {
       return res.status(404).send({
         status: false,
-        msg: "No Book Found!!"
-      })
+        msg: "No Book Found!!",
+      });
     }
     res.status(200).send({
       status: true,
       msg: "Books List !!",
-      data: allBooks
-    })
-  }
-  catch (err) {
+      data: allBooks,
+    });
+  } catch (err) {
     res.status(500).send({
       status: false,
-      msg: err.message
-    })
+      msg: err.message,
+    });
   }
-}
+};
 
-
-
-
-
-
-
-module.exports = { createBook, getBooks }
+module.exports = { createBook, getBooks };
