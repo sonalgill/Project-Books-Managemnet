@@ -3,14 +3,14 @@ const userModel = require("../models/userModel");
 
 const loginUser = async function (req, res) {
   try {
-    let {email, password} = req.body
-    if(!email){
+    let { email, password } = req.body
+    if (!email) {
       return res.status(400).send({
         status: false,
         msg: "Email is required"
       })
     }
-    if(!password){
+    if (!password) {
       return res.status(400).send({
         status: false,
         msg: "Password is required"
@@ -22,38 +22,28 @@ const loginUser = async function (req, res) {
     });
 
     //checking Email and Password(Present/Not)
-    if (checkEmaillAndPassword == null) {
+    if (!checkEmaillAndPassword) {
       return res.status(404).send({
         status: false,
         msg: "this email and password are not register in Our Application",
       });
     }
 
-    //if Found (Creating Jwt Token)
-    let payloadDetails = {
-      userId: checkEmaillAndPassword._id,
-      email: checkEmaillAndPassword.email,
-      password: checkEmaillAndPassword.password,
-      batch: "plutonium",
-      iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + 10 * 60 * 60,
-    };
-
     //Creating Token
 
     let token = jwt.sign(
-      {
-        payloadDetails,
-      },
-      "Group-27-Secret-Key"
+      { userId: checkEmaillAndPassword._id },
+      "Group-27-Secret-Key",
+      { expiresIn: "120s" }
     );
+    let decode = jwt.verify(token, "Group-27-Secret-Key")
 
     res.status(201).send({
       status: true,
       data: token,
-      userId: payloadDetails.userId,
-      exp: payloadDetails.exp,
-      iat: payloadDetails.iat,
+      userId: decode.userId,
+      exp: decode.exp,
+      iat: decode.iat,
     });
   } catch (err) {
     return res.status(500).send({

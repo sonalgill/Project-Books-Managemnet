@@ -12,17 +12,22 @@ exports.authentication = function (req, res, next) {
     }
 
     //verifing that token
-    try {
-      var decodedToken = jwt.verify(checkHeader, "Group-27-Secret-Key");
-    } catch (err) {
-      return res.status(404).send({ status: false, msg: "Token is invalid" });
-    }
 
-    //Seting userId in headers for Future Use
-    req.headers["userId"] = decodedToken.payloadDetails.userId;
-    next();
+    let decodedToken = jwt.verify(checkHeader, "Group-27-Secret-Key", (err, decode) => {
+      if (err) {
+        let msg =
+        err.message === "jwt expired"
+          ? "Token is expired"
+          : "Token is invalid";
+        return res.status(400).send({ status: false, message: msg })
+      }
+      //Seting userId in headers for Future Use
+      req.decode = decode;
+      next()
+    })
+
   } catch (err) {
-    return res.status(500).send({ status: false, msg: "server Error" });
+    return res.status(500).send({ status: false, msg: err.message });
   }
 };
 
