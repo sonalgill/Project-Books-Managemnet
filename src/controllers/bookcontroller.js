@@ -30,7 +30,7 @@ const createBook = async (req, res) => {
       return;
     }
   
-    const { title, excerpt, userId, ISBN, category, subcategory, releasedAt } =
+    const { title, excerpt, userId, ISBN, category, subcategory, releasedAt, deletedAt } =
       data;
 
 
@@ -89,6 +89,7 @@ const createBook = async (req, res) => {
       category,
       subcategory,
       releasedAt: releasedAt ? new Date() : null,
+      deletedAt: deletedAt ? new Date() :null
     };
     const newBookCreated = await bookModel.create(bookData);
     res.status(201).send({
