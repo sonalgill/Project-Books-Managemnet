@@ -55,7 +55,14 @@ const createUser = async (req, res) => {
       if (!password) {
         res.status(400).send({
           staus: false,
-          msg: "Password length should be between 8 to 15 letters",
+          msg: "Password is required",
+        });
+        return;
+      }
+      if (password.length<8 || password.length>15) {
+        res.status(400).send({
+          staus: false,
+          msg: "Length of the password must be between 8 to 15 charaxters",
         });
         return;
       }

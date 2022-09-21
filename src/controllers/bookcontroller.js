@@ -46,7 +46,7 @@ const createBook = async (req, res) => {
     if (alreadyUsedTitle) {
       res
         .status(400)
-        .send({ status: false, msg: "This should be unique" });
+        .send({ status: false, msg: "Title should be unique" });
       return;
     }
     if (!isValid(excerpt)) {
@@ -93,6 +93,18 @@ const createBook = async (req, res) => {
         .send({ status: false, message: "Book subcategory is required" });
       return;
     }
+    if(!releasedAt){
+      res
+        .status(400)
+        .send({ status: false, message: "releasedAt is required" });
+      return;
+    }
+   if(!(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/).test(releasedAt)){
+    res
+        .status(400)
+        .send({ status: false, message: "releasedAt can be a DATE only" });
+      return;
+   }
 
     const user = await userModel.findById(userId);
     if (!user) {
@@ -106,7 +118,7 @@ const createBook = async (req, res) => {
       ISBN,
       category,
       subcategory,
-      releasedAt: releasedAt ? new Date() : null,
+      releasedAt,
       deletedAt: deletedAt ? new Date() :null
     };
     const newBookCreated = await bookModel.create(bookData);
@@ -130,7 +142,7 @@ const createBook = async (req, res) => {
 const getBooks = async function (req, res) {
   try {
     let { userId, category, subcategory } = req.query
-    let filter = {isDeleted: false}
+    let filter = {}
     if (Object.keys(req.query).length) {
       if (userId) { filter.userId = userId }
       if (category) { filter.category = category }
@@ -143,6 +155,7 @@ const getBooks = async function (req, res) {
         })
       }
     }
+    filter.isDeleted = false
     let allBooks = await bookModel.find({ $and: [filter] }).select({
       title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1
     }).sort({ title: 1 })

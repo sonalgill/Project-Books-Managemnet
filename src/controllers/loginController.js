@@ -3,6 +3,19 @@ const userModel = require("../models/userModel");
 
 const loginUser = async function (req, res) {
   try {
+    let {email, password} = req.body
+    if(!email){
+      return res.status(400).send({
+        status: false,
+        msg: "Email is required"
+      })
+    }
+    if(!password){
+      return res.status(400).send({
+        status: false,
+        msg: "Password is required"
+      })
+    }
     let checkEmaillAndPassword = await userModel.findOne({
       email: req.body.email,
       password: req.body.password,
