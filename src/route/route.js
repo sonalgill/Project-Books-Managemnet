@@ -16,6 +16,9 @@ router.post("/login", loginController.loginUser);
 //Create book
 router.post("/books",bookController.createBook)
 
+//get books
+router.get('/books', bookController.getBooks)
+
 
 //=========================== if endpoint is not correct==========================================
 

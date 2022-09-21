@@ -1,6 +1,6 @@
 const bookModel = require("../models/bookModel");
 const userModel = require("../models/userModel");
-const  mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 const isvalidObjectId = function (ObjectId) {
   return mongoose.Types.ObjectId.isValid(ObjectId);
@@ -29,7 +29,7 @@ const createBook = async (req, res) => {
       });
       return;
     }
-  
+
     const { title, excerpt, userId, ISBN, category, subcategory, releasedAt } =
       data;
 
@@ -101,4 +101,57 @@ const createBook = async (req, res) => {
   }
 };
 
-module.exports.createBook = createBook;
+
+
+
+
+
+//============get books =====================//
+
+const getBooks = async function (req, res) {
+  try {
+    let { userId, category, subcategory } = req.query
+    let filter = {isDeleted: false}
+    if (Object.keys(req.query).length) {
+      if (userId) { filter.userId = userId }
+      if (category) { filter.category = category }
+      if (subcategory) { filter.subcategory = subcategory }
+      //------if user provide any other filter any these---------//
+      if (!Object.keys(filter).length) {
+        return res.status(404).send({
+          status: false,
+          msg: "No Book Found!!"
+        })
+      }
+    }
+    let allBooks = await bookModel.find({ $and: [filter] }).select({
+      title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1
+    }).sort({ title: 1 })
+    //-----if no book found--------//
+    if (!allBooks.length) {
+      return res.status(404).send({
+        status: false,
+        msg: "No Book Found!!"
+      })
+    }
+    res.status(200).send({
+      status: true,
+      msg: "Books List !!",
+      data: allBooks
+    })
+  }
+  catch (err) {
+    res.status(500).send({
+      status: false,
+      msg: err.message
+    })
+  }
+}
+
+
+
+
+
+
+
+module.exports = { createBook, getBooks }
