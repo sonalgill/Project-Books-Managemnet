@@ -23,6 +23,9 @@ router.post(
   bookController.createBook
 );
 
+//Get Books
+router.get("/books", middleware.authentication, bookController.getBooks);
+
 //=========================== if endpoint is not correct==========================================
 
 router.all("/*", function (req, res) {
