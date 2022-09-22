@@ -1,6 +1,10 @@
 const jwt = require("jsonwebtoken");
-const { findOne } = require("../models/reviewModel");
 const bookModel = require("../models/bookModel");
+const mongoose = require('mongoose')
+
+function isvalidObjectId(ObjectId) {
+  return mongoose.Types.ObjectId.isValid(ObjectId);
+}
 
 exports.authentication = function (req, res, next) {
   //Checking Header is coomimg from the request header or not
@@ -40,19 +44,36 @@ exports.authentication = function (req, res, next) {
 exports.autherization = async function (req, res, next) {
   //console.log(req.headers.userId);
   try {
-    if (req.body.userId == req.decode.userId) {
-      return next();
-    }
-    //For Book-Id
-    let findUserIdByBookId = await bookModel.findOne({
-      _id: req.params.bookId,
-    });
-    if (findUserIdByBookId.userId == req.decode.userId) {
-      return next();
-    } else {
-      return res
+    if (req.params.bookId) {
+      if (!isvalidObjectId(req.params.bookId)) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "Not a valid BookID" })
+      }
+      let findUserIdByBookId = await bookModel.findById(req.params.bookId)
+      if(!findUserIdByBookId){
+        return res
+        .status(404)
+        .send({ status: false, msg: "No such Book found" }) 
+      }
+      if (findUserIdByBookId.userId != req.decode.userId) {
+        return res
         .status(403)
-        .send({ status: false, msg: "Not Autherized user" });
+        .send({ status: false, msg: "Not an Authorized user" }) 
+      }next()
+    }
+    if (req.body.userId) {
+      if (!isvalidObjectId(req.body.userId)) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "Not a valid userID" })
+      }
+      if (req.body.userId != req.decode.userId) {
+        return res
+        .status(403)
+        .send({ status: false, msg: "Not Autherized user" })
+      }
+      next()
     }
   } catch (err) {
     return res.status(500).send({

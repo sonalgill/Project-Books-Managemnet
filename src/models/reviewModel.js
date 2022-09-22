@@ -18,7 +18,7 @@ const reviewModel = new mongoose.Schema(
         },
         rating: {
             type: Number,
-            value: /^[1-5]$/,
+            enum: [1, 2, 3, 4, 5],
             required: true
         },
         review: {

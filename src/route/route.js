@@ -12,10 +12,18 @@ const reviewController = require("../controllers/reviewController");
 const middleware = require("../middleware/auth");
 
 //Create User API
-router.post("/register", validator.createUser, userController.createUser);
+router.post(
+  "/register",
+  validator.createUser,
+  userController.createUser
+);
 
 //logIn API
-router.post("/login", validator.userLogin, loginController.loginUser);
+router.post(
+  "/login",
+  validator.userLogin,
+  loginController.loginUser
+);
 
 //Create book
 router.post(
@@ -27,7 +35,12 @@ router.post(
 );
 
 //Get Books
-router.get("/books", middleware.authentication, bookController.getBooks);
+router.get(
+  "/books",
+  middleware.authentication,
+  validator.getBookByQuery,
+  bookController.getBooks
+);
 
 //Get Book by BookID
 router.get(
@@ -40,14 +53,18 @@ router.get(
 //Creating Reviews
 router.post(
   "/books/:bookId/review",
-  middleware.authentication,
-  middleware.autherization,
   validator.reviews,
   reviewController.reviews
 );
 
 //Update books by bookId
-router.put("/books/:bookId",bookController.updateBook)
+router.put(
+  "/books/:bookId",
+  middleware.authentication,
+  middleware.autherization,
+  validator.updateBook,
+  bookController.updateBook
+)
 
 //=========================== if endpoint is not correct==========================================
 
