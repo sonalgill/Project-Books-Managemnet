@@ -8,7 +8,7 @@ exports.authentication = function (req, res, next) {
     if (!checkHeader) {
       return res
         .status(400)
-        .send({ status: false, msg: "IN Headers Section token is madatory" });
+        .send({ status: false, msg: "In headers section token is madatory" });
     }
 
     //verifing that token

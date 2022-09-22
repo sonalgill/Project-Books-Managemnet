@@ -29,6 +29,9 @@ router.get("/books", middleware.authentication, bookController.getBooks);
 //Get Book by BookID
 router.get("/books/:bookId", middleware.authentication, bookController.getBookById)
 
+//Update books by bookId
+router.put("/books/:bookId",bookController.updateBook)
+
 //=========================== if endpoint is not correct==========================================
 
 router.all("/*", function (req, res) {

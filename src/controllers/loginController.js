@@ -34,7 +34,7 @@ const loginUser = async function (req, res) {
     let token = jwt.sign(
       { userId: checkEmaillAndPassword._id },
       "Group-27-Secret-Key",
-      { expiresIn: "120s" }
+      { expiresIn: "12000s" }
     );
     let decode = jwt.verify(token, "Group-27-Secret-Key")
 
