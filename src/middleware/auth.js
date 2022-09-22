@@ -36,7 +36,7 @@ exports.authentication = function (req, res, next) {
 exports.autherization = function (req, res, next) {
   //console.log(req.headers.userId);
   try {
-    if (req.body.userId == req.headers.userId) {
+    if (req.body.userId == req.decode.userId) {
       next();
     } else {
       return res
