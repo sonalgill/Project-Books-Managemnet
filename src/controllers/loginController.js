@@ -1,16 +1,33 @@
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel");
+const validator = require("../validations/validations");
 
 const loginUser = async function (req, res) {
   try {
-    //Creating Token
+    //Email And Password (Present?/Not)
+    let checkEmaillAndPassword = await userModel.findOne({
+      email: req.body.email,
+      password: req.body.password,
+    });
+    //bcz findOne Returns Null(If no Doc Found)
+    if (checkEmaillAndPassword == null) {
+      return res.status(404).send({
+        status: false,
+        msg: "this email and password are not register in Our Application",
+      });
+    }
+    //
 
     let token = jwt.sign(
       { userId: checkEmaillAndPassword._id },
       "Group-27-Secret-Key",
-      { expiresIn: "1d" }
+      {
+        expiresIn: "1d",
+      }
     );
-    let decode = jwt.verify(token, "Group-27-Secret-Key")
+
+    //Verifing Token
+    let decode = jwt.verify(token, "Group-27-Secret-Key");
 
     res.status(201).send({
       status: true,
@@ -22,7 +39,7 @@ const loginUser = async function (req, res) {
   } catch (err) {
     return res.status(500).send({
       msg: false,
-      errMessage: err.message
+      errMessage: err.message,
     });
   }
 };

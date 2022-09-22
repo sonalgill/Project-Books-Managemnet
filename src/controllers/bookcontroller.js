@@ -1,8 +1,7 @@
 const bookModel = require("../models/bookModel");
 const userModel = require("../models/userModel");
-const mongoose = require("mongoose");
-const reviewModel = require('../models/reviewModel')
 
+const reviewModel = require("../models/reviewModel");
 
 //==============================create book====================================//
 
@@ -12,10 +11,10 @@ const createBook = async (req, res) => {
     res.status(201).send({
       status: true,
       message: "Book created successfully",
-      data: newBookCreated
-    })
+      data: newBookCreated,
+    });
   } catch (error) {
-    res.status(500).send({ status: false, message: error.message })
+    res.status(500).send({ status: false, message: error.message });
   }
 };
 
@@ -23,13 +22,19 @@ const createBook = async (req, res) => {
 
 const getBooks = async function (req, res) {
   try {
-    let { userId, category, subcategory } = req.query
-    let filter = {}
+    let { userId, category, subcategory } = req.query;
+    let filter = {};
 
     if (Object.keys(req.query).length) {
-      if (userId) { filter.userId = userId }
-      if (category) { filter.category = category }
-      if (subcategory) { filter.subcategory = subcategory }
+      if (userId) {
+        filter.userId = userId;
+      }
+      if (category) {
+        filter.category = category;
+      }
+      if (subcategory) {
+        filter.subcategory = subcategory;
+      }
       //------if user provide any other filter any these---------//
       if (!Object.keys(filter).length) {
         return res.status(404).send({
@@ -39,10 +44,18 @@ const getBooks = async function (req, res) {
       }
     }
 
-    filter.isDeleted = false
-    let allBooks = await bookModel.find({ $and: [filter] }).select({
-      title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1
-    }).sort({ title: 1 })
+    filter.isDeleted = false;
+    let allBooks = await bookModel
+      .find({ $and: [filter] })
+      .select({
+        title: 1,
+        excerpt: 1,
+        userId: 1,
+        category: 1,
+        releasedAt: 1,
+        reviews: 1,
+      })
+      .sort({ title: 1 });
     //-----if no book found--------//
     if (!allBooks.length) {
       return res.status(404).send({
@@ -63,9 +76,6 @@ const getBooks = async function (req, res) {
   }
 };
 
-
-
-
 //-- get book by bookID
 let getBookById = async (req, res) => {
   try {
@@ -78,7 +88,7 @@ let getBookById = async (req, res) => {
         message: `Book is not found with this ID: ${bookId}`,
       });
     }
-//getting the data from review Model
+    //getting the data from review Model
     let reviews = await reviewModel
       .find({ bookId: bookId, isDeleted: false })
       .select({
@@ -102,6 +112,5 @@ let getBookById = async (req, res) => {
     return res.status(500).send({ status: false, Error: error.message });
   }
 };
-
 
 module.exports = { createBook, getBooks, getBookById };
