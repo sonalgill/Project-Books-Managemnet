@@ -76,14 +76,7 @@ const getBooks = async function (req, res) {
   }
 };
 
-<<<<<<< HEAD
-
-
-
-//=============================get book by bookID===============================//
-=======
 //-- get book by bookID
->>>>>>> 7383267d7791c0838e965631f5dc833f1ee0f48a
 let getBookById = async (req, res) => {
   try {
     let bookId = req.params.bookId;
@@ -120,54 +113,4 @@ let getBookById = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
-//============================update book========================================//
-
-const updateBook=async(req,res)=>{
-  try{
-  let requestBody=req.body
-  if(!isvalidRequestBody(requestBody)){
-    res.status(400).send({statua:false, msg:`Request body can't be empty`})
-    return
-  }
-  let bookId=req.params.bookId
-  if (!isvalidObjectId(bookId)) {
-    res
-      .status(400)
-      .send({ status: false, message: `${bookId} is not a valid book id ` });
-      return
-  }
-
-  let uniqueTitleAndIsbn = await bookModel.find({ $or: [{ title: requestBody.title }, { ISBN: requestBody.ISBN }] });
-  if (uniqueTitleAndIsbn.length !== 0) {
-      if (uniqueTitleAndIsbn [0].title == requestBody.title) return res.status(400).send({ status: false, data: "Title is Already Exists,Please Input Another title" })
-      else { return res.status(400).send({ status: false, data: "ISBN Number Already Exists,Please Input Another ISBN Number" }) }
-  };
-
-  const book = await bookModel.findOne({_id: bookId});
-    if (book.isDeleted === false) {
-      let updatedBookData = await bookModel.findByIdAndUpdate(
-        bookId,
-        {
-          title: requestBody.title,
-          excerpt: requestBody.excerpt,
-          releasedAt: requestBody.releasedAt,
-          ISBN: requestBody.ISBN
-        },
-        { new: true }
-      );
-      res.status(200).send({ status: true, data: updatedBookData });
-    } else {
-      res.status(404).send("File is not present or Deleted");
-    }
-}catch(err){
-  res.status(500).send({status:false, error:err.message})
-}
-}
-
-
-
-module.exports = { createBook, getBooks, getBookById, updateBook };
-=======
 module.exports = { createBook, getBooks, getBookById };
->>>>>>> 7383267d7791c0838e965631f5dc833f1ee0f48a
