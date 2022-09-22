@@ -1,4 +1,6 @@
 const jwt = require("jsonwebtoken");
+const { findOne } = require("../models/reviewModel");
+const bookModel = require("../models/bookModel");
 
 exports.authentication = function (req, res, next) {
   //Checking Header is coomimg from the request header or not
@@ -12,20 +14,22 @@ exports.authentication = function (req, res, next) {
     }
 
     //verifing that token
-
-    let decodedToken = jwt.verify(checkHeader, "Group-27-Secret-Key", (err, decode) => {
-      if (err) {
-        let msg =
-        err.message === "jwt expired"
-          ? "Token is expired"
-          : "Token is invalid";
-        return res.status(400).send({ status: false, message: msg })
+    let decodedToken = jwt.verify(
+      checkHeader,
+      "Group-27-Secret-Key",
+      (err, decode) => {
+        if (err) {
+          let msg =
+            err.message === "jwt expired"
+              ? "Token is expired"
+              : "Token is invalid";
+          return res.status(400).send({ status: false, message: msg });
+        }
+        //Seting userId in headers for Future Use
+        req.decode = decode;
+        next();
       }
-      //Seting userId in headers for Future Use
-      req.decode = decode;
-      next()
-    })
-
+    );
   } catch (err) {
     return res.status(500).send({ status: false, msg: err.message });
   }
@@ -33,19 +37,28 @@ exports.authentication = function (req, res, next) {
 
 //Autherization part
 
-exports.autherization = function (req, res, next) {
+exports.autherization = async function (req, res, next) {
   //console.log(req.headers.userId);
   try {
-    if (req.body.userId == req.headers.userId) {
-      next();
+    if (req.body.userId == req.decode.userId) {
+      return next();
+    }
+    //For Book-Id
+    let findUserIdByBookId = await bookModel.findOne({
+      _id: req.params.bookId,
+    });
+    if (findUserIdByBookId.userId == req.decode.userId) {
+      return next();
     } else {
       return res
         .status(403)
         .send({ status: false, msg: "Not Autherized user" });
     }
   } catch (err) {
-    return res
-      .status(500)
-      .send({ status: false, msg: "Server Error !!", errMessage: err.message });
+    return res.status(500).send({
+      status: false,
+      msg: " Authrization Server Error !!",
+      errMessage: err.message,
+    });
   }
 };
