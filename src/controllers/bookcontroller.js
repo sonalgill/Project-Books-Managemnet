@@ -126,9 +126,9 @@ const updateBook = async (req, res) => {
     let book = await bookModel.findOne({ _id: bookId, isDeleted: false });
     if (!book) { return res.status(404).send({ status: false, msg: "No Such Book found" }) }
 
-    let uniqueTitleAndIsbn = await bookModel.find({ $or: [{ title: requestBody.title }, { ISBN: requestBody.ISBN }] });
-    if (uniqueTitleAndIsbn.length !== 0) {
-      if (uniqueTitleAndIsbn[0].title == requestBody.title)
+    let uniqueTitleAndIsbn = await bookModel.findOne({ $or: [{ title: requestBody.title }, { ISBN: requestBody.ISBN }] });
+    if (uniqueTitleAndIsbn) {
+      if (uniqueTitleAndIsbn.title == requestBody.title)
         return res.status(400).send({
           status: false,
           msg: "Title Already Exists. Please Input Another title"
@@ -150,7 +150,10 @@ const updateBook = async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).send({ status: true, data: updatedBookData });
+    res.status(200).send({
+      status: true,
+      msg: "Book updated Successfulyy",
+       data: updatedBookData });
   } catch (err) {
     res.status(500).send({ status: false, error: err.message })
   }
@@ -158,4 +161,29 @@ const updateBook = async (req, res) => {
 
 
 
-module.exports = { createBook, getBooks, getBookById, updateBook };
+// delete book by bookID in path params
+
+const deleteBook = async (req, res) => {
+  try {
+    let bookId = req.params.bookId
+    let checkBook = await bookModel.findOne({ _id: bookId, isDeleted: false })
+    if (!checkBook) {
+      return res
+        .status(404)
+        .send({ status: false, msg: "No such book exists !" })
+    }
+    let delBook = await bookModel.findByIdAndUpdate(bookId, { isDeleted: true, deletedAt: Date() }, { new: true, upsert: true })
+    res.status(200).send({
+      status: true,
+      msg: "Book deleted successfully",
+      data: delBook
+    })
+
+  } catch (err) {
+    res.status(500).send({ status: false, error: err.message })
+  }
+}
+
+
+
+module.exports = { createBook, getBooks, getBookById, updateBook, deleteBook };

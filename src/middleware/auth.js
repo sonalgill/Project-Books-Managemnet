@@ -60,7 +60,10 @@ exports.autherization = async function (req, res, next) {
         return res
         .status(403)
         .send({ status: false, msg: "Not an Authorized user" }) 
-      }next()
+      }return next()
+    }
+    if(!req.body.userId){
+      return res.send("ID not found")
     }
     if (req.body.userId) {
       if (!isvalidObjectId(req.body.userId)) {

@@ -66,6 +66,23 @@ router.put(
   bookController.updateBook
 )
 
+//delete by BookId
+router.delete(
+  '/books/:bookId',
+  middleware.authentication,
+  middleware.autherization,
+  validator.delBookbyBookId,
+  bookController.deleteBook
+)
+
+//delete review
+
+router.delete(
+  '/books/:bookId/review/:reviewId',
+  validator.deleteReview,
+  reviewController.deleteReview
+)
+
 //=========================== if endpoint is not correct==========================================
 
 router.all("/*", function (req, res) {

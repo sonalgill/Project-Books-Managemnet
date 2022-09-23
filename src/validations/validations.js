@@ -237,15 +237,15 @@ module.exports = {
     },
 
     getBookByQuery: async (req, res, next) => {
-        try{
-            if(req.query.userId){
-                if(!isvalidObjectId(req.query.userId)){
+        try {
+            if (req.query.userId) {
+                if (!isvalidObjectId(req.query.userId)) {
                     return res
-                    .status(400)
-                    .send({ status: false, message: "UserId is not Valid" });
+                        .status(400)
+                        .send({ status: false, message: "UserId is not Valid" });
                 }
-            }next()
-        }catch (e) {
+            } next()
+        } catch (e) {
             res.status(500).send({ status: false, error: e.message });
         }
     },
@@ -273,17 +273,10 @@ module.exports = {
                     .status(400)
                     .send({ status: false, msg: "bookId Is required !!" });
             }
-            if(!isvalidObjectId(bookId) || !isvalidObjectId(req.params.bookId)){
+            if (!isvalidObjectId(bookId) || !isvalidObjectId(req.params.bookId)) {
                 return res
                     .status(400)
                     .send({ status: false, msg: "Not a valid BookID !!" })
-            }
-
-            //reviewedBy (Madatory)
-            if (!reviewedBy) {
-                return res
-                    .status(400)
-                    .send({ status: false, msg: "reviewedBy Is required !!" });
             }
             //reviewedAt (Madatory)
             if (!reviewedAt) {
@@ -292,7 +285,7 @@ module.exports = {
                     .send({ status: false, msg: "reviewedAt Is required !!" });
             }
             //rating (Madatory)
-            if (!(/^[1-5]$/).test(rating)){
+            if (!(/^[1-5]$/).test(rating)) {
                 return res
                     .status(400)
                     .send({ status: false, msg: "rating should be from 1-5 !!" });
@@ -315,6 +308,41 @@ module.exports = {
                 return res
                     .status(400)
                     .send({ statua: false, msg: `Request body can't be empty` })
+            }
+            next()
+        } catch (e) {
+            res.status(500).send({ status: false, error: e.message });
+        }
+    },
+
+    delBookbyBookId: (req, res, next) => {
+        try {
+            if (!isvalidObjectId(req.params.bookId)) {
+                return res.statua(400).send({
+                    status: false,
+                    msg: "Not a valid BookID"
+                })
+            }
+            next()
+
+        } catch (e) {
+            res.status(500).send({ status: false, error: e.message });
+        }
+    },
+
+    deleteReview: (req, res, next) => {
+        try {
+            let reviewID = req.params.reviewId
+            let bookID = req.params.bookId
+            if (!isvalidObjectId(reviewID)) {
+                return res
+                    .status(400)
+                    .send({ status: false, message: "ReviewID is not a valid review id" })
+            }
+            if (!isvalidObjectId(bookID)) {
+                return res
+                    .status(400)
+                    .send({ status: false, message: "BookID is not a valid book id" })
             }
             next()
         } catch (e) {
