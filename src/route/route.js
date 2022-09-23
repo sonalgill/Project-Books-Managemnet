@@ -12,18 +12,10 @@ const reviewController = require("../controllers/reviewController");
 const middleware = require("../middleware/auth");
 
 //Create User API
-router.post(
-  "/register",
-  validator.createUser,
-  userController.createUser
-);
+router.post("/register", validator.createUser, userController.createUser);
 
 //logIn API
-router.post(
-  "/login",
-  validator.userLogin,
-  loginController.loginUser
-);
+router.post("/login", validator.userLogin, loginController.loginUser);
 
 //Create book
 router.post(
@@ -64,25 +56,33 @@ router.put(
   middleware.autherization,
   validator.updateBook,
   bookController.updateBook
-)
+);
 
 //delete by BookId
 router.delete(
-  '/books/:bookId',
+  "/books/:bookId",
   middleware.authentication,
   middleware.autherization,
   validator.delBookbyBookId,
   bookController.deleteBook
-)
+);
 
+//update review
+
+router.put(
+  "/books/:bookId/review/:reviewId",
+  validator.updateReviews,
+  reviewController.updateReviews
+);
+
+//
 //delete review
 
 router.delete(
-  '/books/:bookId/review/:reviewId',
+  "/books/:bookId/review/:reviewId",
   validator.deleteReview,
   reviewController.deleteReview
-)
-
+);
 //=========================== if endpoint is not correct==========================================
 
 router.all("/*", function (req, res) {
