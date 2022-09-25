@@ -7,6 +7,9 @@ const reviewModel = require("../models/reviewModel");
 
 const createBook = async (req, res) => {
   try {
+    
+    req.body.title = req.body.title.replace(/\s+/g, " ");
+
     let newBookCreated = await bookModel.create(req.body);
     res.status(201).send({
       status: true,
@@ -53,8 +56,8 @@ const getBooks = async function (req, res) {
         userId: 1,
         category: 1,
         releasedAt: 1,
-        reviews: 1,
-      })
+        reviews: 1
+      }).collation({locale: "en"})
       .sort({ title: 1 });
     //-----if no book found--------//
     if (!allBooks.length) {

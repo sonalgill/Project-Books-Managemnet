@@ -7,7 +7,7 @@ module.exports = {
   reviews: async function (req, res) {
     //first Checking Book (Present?/Not) || (Deleted?/Not)
     try {
-      let checkBook = await bookModel.findOne({ _id: req.params.bookId });
+      let checkBook = await bookModel.findOne({ _id: req.params.bookId }).lean();
       if (checkBook == null) {
         return res
           .status(404)
@@ -29,24 +29,13 @@ module.exports = {
         },
         { new: true }
       );
-      let result = {
-        _id: checkBook._id,
-        title: checkBook.title,
-        excerpt: checkBook.excerpt,
-        userId: checkBook.userId,
-        ISBN: checkBook.ISBN,
-        category: checkBook.category,
-        subcategory: checkBook.subcategory,
-        reviews: checkBook.reviews,
-        deletedAt: checkBook.deletedAt,
-        isDeleted: checkBook.isDeleted,
-        releasedAt: checkBook.releasedAt,
-        reviewsData: reviewsData,
-      };
+
+      checkBook.review = reviewsData
+
       return res.status(201).send({
         status: true,
         msg: "Review created Successfully",
-        data: result,
+        data: checkBook,
       });
     } catch (err) {
       return res.send({
@@ -61,7 +50,7 @@ module.exports = {
   updateReviews: async function (req, res) {
     //Checking BookId from params
     try {
-      let checkBookId = await bookModel.findOne({ _id: req.params.bookId });
+      let checkBookId = await bookModel.findOne({ _id: req.params.bookId }).lean();
       if (checkBookId == null) {
         return res.status(404).send({ status: false, msg: "Book Not Found" });
       }
@@ -109,24 +98,11 @@ module.exports = {
       //destucturing
       // let result = { checkBookId, allReviews };
 
-      let result = {
-        _id: checkBookId._id,
-        title: checkBookId.title,
-        excerpt: checkBookId.excerpt,
-        userId: checkBookId.userId,
-        ISBN: checkBookId.ISBN,
-        category: checkBookId.category,
-        subcategory: checkBookId.subcategory,
-        reviews: checkBookId.reviews,
-        deletedAt: checkBookId.deletedAt,
-        isDeleted: checkBookId.isDeleted,
-        releasedAt: checkBookId.releasedAt,
-        reviewsData: [updatedReviewData],
-      };
-      //
-      return res.status(200).send({ status: true, data: result });
+      checkBookId.updatedReview = updatedReviewData
+
+      return res.status(200).send({ status: true, data: checkBookId });
     } catch (err) {
-      return res.status(500).send({ err: err.message, msg: "Server error!!!" });
+      return res.status(500).send({ status: false, err: err.message });
     }
   },
 

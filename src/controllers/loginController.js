@@ -13,7 +13,7 @@ const loginUser = async function (req, res) {
     if (checkEmaillAndPassword == null) {
       return res.status(404).send({
         status: false,
-        msg: "this email and password are not register in Our Application",
+        msg: "this email and password are not register in Our Database",
       });
     }
     //
@@ -27,15 +27,23 @@ const loginUser = async function (req, res) {
     );
 
     //Verifing Token
-    let decode = jwt.verify(token, "Group-27-Secret-Key");
-
-    res.status(201).send({
-      status: true,
-      data: token,
-      userId: decode.userId,
-      exp: decode.exp,
-      iat: decode.iat,
-    });
+    let decode = jwt.verify(
+      token,
+      "Group-27-Secret-Key",
+      (err, decode) => {
+        if (err) {
+          let msg =
+            err.message === "jwt expired"
+              ? "Token is expired"
+              : "Token is invalid";
+          return res.status(400).send({ status: false, message: msg });
+        }
+        res.status(201).send({
+          status: true,
+          data: token,
+          tokenDetails: decode
+        })
+      })
   } catch (err) {
     return res.status(500).send({
       msg: false,

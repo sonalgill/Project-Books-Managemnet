@@ -42,9 +42,11 @@ function isValid(value) {
 }
 
 function isValidDate(value) {
-  return /^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/.test(
-    value
-  );
+  return /^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/.test(value)
+}
+
+function isValidISBN(value) {
+  return /^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)/.test(value)
 }
 
 module.exports = {
@@ -193,6 +195,11 @@ module.exports = {
           .status(400)
           .send({ status: false, message: "Book ISBN is required" });
       }
+      if (!isValidISBN(ISBN)) {
+        return res
+          .status(400)
+          .send({ status: false, message: "Book ISBN is inValid" });
+      }
       if (!isValid(category)) {
         return res
           .status(400)
@@ -218,7 +225,10 @@ module.exports = {
       if (!user) {
         res.status(400).send({ status: false, message: "User does not exit" });
       }
-      let alreadyUsedTitle = await bookModel.findOne({ title });
+
+      title = title.replace(/\s+/g, " ");
+      title = title.trim()
+      let alreadyUsedTitle = await bookModel.findOne({ title: { $regex: title, $options: 'i' } });
       if (alreadyUsedTitle) {
         return res
           .status(400)
@@ -280,11 +290,21 @@ module.exports = {
           .status(400)
           .send({ status: false, msg: "Not a valid BookID !!" });
       }
+      if (req.params.bookId != bookId) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "Provide same BookID in params and body" })
+      }
       //reviewedAt (Madatory)
       if (!reviewedAt) {
         return res
           .status(400)
           .send({ status: false, msg: "reviewedAt Is required !!" });
+      }
+      if (!isValidDate(reviewedAt)) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "Provide a valid date in reviwedAt !!" });
       }
       //rating (Madatory)
       if (!/^[1-5]$/.test(rating)) {
@@ -310,6 +330,13 @@ module.exports = {
         return res
           .status(400)
           .send({ statua: false, msg: `Request body can't be empty` });
+      }
+      if (req.body.ISBN) {
+        if (!isValidISBN(req.body.ISBN)) {
+          return res
+            .status(400)
+            .send({ status: false, message: "Book ISBN is inValid" });
+        }
       }
       next();
     } catch (e) {
@@ -346,6 +373,13 @@ module.exports = {
         status: false,
         msg: "review is not a valid book id",
       });
+    }
+    if (req.body.rating) {
+      if (!/^[1-5]$/.test(req.body.rating)) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "rating should be from 1-5 !!" });
+      }
     }
 
     //
