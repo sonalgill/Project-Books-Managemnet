@@ -307,15 +307,15 @@ module.exports = {
           .send({ status: false, msg: "Provide a valid date in reviwedAt !!" });
       }
       //rating (Madatory)
+            if (!rating) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "rating Is required !!" });
+      }
       if (!/^[1-5]$/.test(rating)) {
         return res
           .status(400)
           .send({ status: false, msg: "rating should be from 1-5 !!" });
-      }
-      if (!rating) {
-        return res
-          .status(400)
-          .send({ status: false, msg: "rating Is required !!" });
       }
       next();
     } catch (e) {
